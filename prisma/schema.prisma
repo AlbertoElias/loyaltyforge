@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(uuid())
+  collections Collection[]
+}
+
+model Collection {
+  id                  String               @id @default(cuid())
+  crossmintId         String
+  name                String
+  description         String?
+  imageUrl            String?
+  nftCount            Int                  @default(0)
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id])
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  verificationStrings VerificationString[]
+  traits              Trait[]
+}
+
+model VerificationString {
+  id           String     @id @default(cuid())
+  value        String
+  collectionId String
+  used         Boolean    @default(false)
+  collection   Collection @relation(fields: [collectionId], references: [id])
+}
+
+model Trait {
+  id           String     @id @default(uuid())
+  key          String
+  value        String
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+}
